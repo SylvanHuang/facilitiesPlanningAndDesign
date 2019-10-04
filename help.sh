@@ -1,0 +1,14 @@
+#!/bin/bash
+
+python3 newOpt.py << EOF
+4
+ABCD
+30,30,30
+BDCAC
+300
+BDCAC700
+DBDCAC
+900
+ABCA
+200
+EOF
