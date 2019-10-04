@@ -17,9 +17,11 @@ class solver():
         self.distances = []
         self.distanceMatrix = []
         self.machines = ''
-        self.lowestPenalty = []
+        self.smallestPenalty = 999999999
+        self.foundSmaller = False
 
         self.makeTable()
+        self.smallestPenaltyOrder = self.machines
         self.calculateFlows()
         self.printFromTo()
         self.generateAllOrders()
@@ -172,12 +174,13 @@ class solver():
             print(widthLine)
 
     def generateAllOrders(self):
+        self.foundSmaller = False
 
-        for i, firstMachine in enumerate(self.machines):
-            for j, secondMachine in enumerate(self.machines):
+        for i, firstMachine in enumerate(self.smallestPenaltyOrder):
+            for j, secondMachine in enumerate(self.smallestPenaltyOrder):
                 if j < i:
                     newOrder = ''
-                    for letter in self.machines:
+                    for letter in self.smallestPenaltyOrder:
                         if letter == firstMachine:
                             newOrder += secondMachine
 
@@ -190,16 +193,39 @@ class solver():
                     print('\n\nORDER:\t{}'.format(newOrder))
 
                     self.printMatrix(self.distanceMatrix)
-                    print('TOTAL PENALTY INCURRED:\t{}'.format(self.calculatePenalty(self.distanceMatrix)))
+                    penaltySum = self.calculatePenalty(self.distanceMatrix)
+
+                    print('TOTAL PENALTY INCURRED:\t{}'.format(penaltySum))
+
+                    if penaltySum < self.smallestPenalty:
+                        self.smallestPenalty = penaltySum
+                        self.smallestPenaltyOrder = newOrder
+                        self.foundSmaller = True
+
                 self.resetDistanceMatrix()
 
         # print the first order of machines without changining the order
-        self.calculateDistance(self.machines)
-        print('\n\nORDER:\t{}'.format(self.machines))
+        self.calculateDistance(self.smallestPenaltyOrder)
+        print('\n\nORDER:\t{}'.format(self.smallestPenaltyOrder))
 
         self.printMatrix(self.distanceMatrix)
-        print('TOTAL PENALTY INCURRED:\t{}'.format(self.calculatePenalty(self.distanceMatrix)))
+
+        penaltySum = self.calculatePenalty(self.distanceMatrix)
+
+        print('TOTAL PENALTY INCURRED:\t{}'.format(penaltySum))
         self.resetDistanceMatrix()
+
+        if penaltySum < self.smallestPenalty:
+            self.smallestPenalty = penaltySum
+            self.smallestPenaltyOrder = newOrder
+            self.foundSmaller = True
+
+        if self.foundSmaller == True:
+            print('\n\n~~~~~NEW ITERATION~~~~~\n\n')
+            self.generateAllOrders()
+        else:
+            print('SMALLEST PENALTY INCURRED: \t{}'.format(self.smallestPenalty))
+            print('SMALLEST PENALTY ORDER:\t\t{}'.format(self.smallestPenaltyOrder))
 
 if __name__ == '__main__':
     s = solver()
