@@ -1,4 +1,5 @@
 import string
+import time
 
 class solver():
     def __init__(self):
@@ -20,10 +21,13 @@ class solver():
         self.smallestPenalty = 999999999
         self.foundSmaller = False
 
+        # makes the table of products and populates it with 0s
         self.makeTable()
         self.smallestPenaltyOrder = self.machines
+
         self.calculateFlows()
         self.printFromTo()
+        self.t = time.time()
         self.generateAllOrders()
 
     # gathers all of the facility information from the user
@@ -39,7 +43,6 @@ class solver():
         self.distances = list(input('Enter the distances between machine placements separated by a comma: ').split(','))
         for i, distance in enumerate(self.distances):
             self.distances[i] = int(self.distances[i])
-        print(self.distances)
 
         for machine in self.machines:
             # temporary list for each row
@@ -91,6 +94,7 @@ class solver():
                 if i != j:
                     self.flows[i][j] = flowVolume
 
+    # print the from to chart
     def printFromTo(self):
         print('FROM - TO CHART')
         header  = '|{: ^5s}|'.format(' ')
@@ -147,6 +151,7 @@ class solver():
                     penaltySum += distance * flow
         return penaltySum
 
+    # print any matrix; this will eventually consume the `printFromTo` but I don't have time right now
     def printMatrix(self, matrix):
         header  = '|{: ^5s}|'.format(' ')
         widthLine = ''
@@ -172,6 +177,11 @@ class solver():
                     row += ' {: ^5d}|'.format(0)
             print(row)
             print(widthLine)
+
+    '''
+    generate all orders and calculate the flow penalties
+    continues to do this until the flow penalty no longer decreases
+    '''
 
     def generateAllOrders(self):
         self.foundSmaller = False
@@ -224,6 +234,7 @@ class solver():
             print('\n\n~~~~~NEW ITERATION~~~~~\n\n')
             self.generateAllOrders()
         else:
+            print('TOTAL TIME TO CALCULATE {} secs'.format(time.time() - self.t))
             print('SMALLEST PENALTY INCURRED: \t{}'.format(self.smallestPenalty))
             print('SMALLEST PENALTY ORDER:\t\t{}'.format(self.smallestPenaltyOrder))
 
