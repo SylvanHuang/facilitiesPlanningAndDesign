@@ -1,4 +1,4 @@
-# Facilities Planning and Design (IE4650)
+# Facilities Planning and Design
 ---
 Posting the programs to help solve optimization problems with regard to floor layouts in facilities.
 
