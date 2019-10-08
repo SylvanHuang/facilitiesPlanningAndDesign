@@ -1,2 +1,2 @@
 #!/bin/bash
-python~/.facilitiesPlanningAndDesign/$1
+python3 ~/.facilitiesPlanningAndDesign/$1
