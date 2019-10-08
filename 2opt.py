@@ -17,12 +17,13 @@ class solver():
         self.flows = []
         self.distances = []
         self.distanceMatrix = []
-        self.machines = ''
+        self.machines = []
         self.smallestPenalty = 999999999
         self.foundSmaller = False
 
         # makes the table of products and populates it with 0s
         self.makeTable()
+
         self.smallestPenaltyOrder = self.machines
 
         self.calculateFlows()
@@ -37,13 +38,16 @@ class solver():
         numProducts = int(input('Enter the number of products:\t\t'))
 
         # prompt the user to enter the machines that are available
-        self.machines = input('Enter the machines that are available:\t')
+        self.machines = list(input('Enter the machines that are available separated by a comma:\t').split(','))
 
         # prompt the user to enter the distances between machine placements
         self.distances = list(input('Enter the distances between machine placements separated by a comma: ').split(','))
+
+        # convert all distances to ints and store in 2d list
         for i, distance in enumerate(self.distances):
             self.distances[i] = int(self.distances[i])
 
+        # make the flows and distance matrices
         for machine in self.machines:
             # temporary list for each row
             temp = []
@@ -58,8 +62,8 @@ class solver():
 
         # loop through and allow the user to enter all of their mahcine problems
         for i in range(0, numProducts):
-            routing = input('Enter routing of product {}:\t\t'.format(i + 1))
-            volume = int(input('Enter the volume for product {}:\t\t'.format(i + 1)))
+            routing = input('Enter routing of product {} separated by a comma:\t\t'.format(i + 1))
+            volume = int(input('Enter the volume for product {}:\t\t\t\t\t'.format(i + 1)))
             self.userDict[i] = [routing, volume]
 
             # formatting becuase we are IE but we aren't animals
@@ -80,14 +84,25 @@ class solver():
     def calculateFlows(self):
         for i, firstMachine in enumerate(self.machines):
             for j, secondMachine in enumerate(self.machines):
-                queryString = firstMachine + secondMachine
+
+                # construct the query string
+                queryString = firstMachine + ',' + secondMachine
+
+                # have to construct the reverse query stirng instead of qs[::-1]
+                # in case there is a machine whose alias is more than one character long
+                rQueryString = secondMachine + ',' + firstMachine
+
+                # reset the flow volume to 0
                 flowVolume = 0
+
                 for key in self.userDict:
+
                     # checks for the query string
                     if queryString in self.userDict[key][0]:
                         flowVolume += self.userDict[key][1]
+
                     # checks for the reverse fo the query string
-                    if queryString[::-1] in self.userDict[key][0]:
+                    if rQueryString in self.userDict[key][0]:
                         flowVolume += self.userDict[key][1]
 
                 # don't even consider values generated when i == j
@@ -186,6 +201,9 @@ class solver():
     def generateAllOrders(self):
         self.foundSmaller = False
 
+        # the original order going into the iteration
+        originalOrder = ''.join(self.smallestPenaltyOrder)
+
         for i, firstMachine in enumerate(self.smallestPenaltyOrder):
             for j, secondMachine in enumerate(self.smallestPenaltyOrder):
                 if j < i:
@@ -215,8 +233,8 @@ class solver():
                 self.resetDistanceMatrix()
 
         # print the first order of machines without changining the order
-        self.calculateDistance(self.smallestPenaltyOrder)
-        print('\n\nORDER:\t{}'.format(self.smallestPenaltyOrder))
+        self.calculateDistance(originalOrder)
+        print('\n\nORDER:\t{}'.format(originalOrder))
 
         self.printMatrix(self.distanceMatrix)
 
@@ -225,14 +243,12 @@ class solver():
         print('TOTAL PENALTY INCURRED:\t{}'.format(penaltySum))
         self.resetDistanceMatrix()
 
-        if penaltySum < self.smallestPenalty:
-            self.smallestPenalty = penaltySum
-            self.smallestPenaltyOrder = newOrder
-            self.foundSmaller = True
-
+        # recursivley generate orders of machines unitl the flow cost stops decreasing
         if self.foundSmaller == True:
             print('\n\n~~~~~NEW ITERATION~~~~~\n\n')
             self.generateAllOrders()
+
+        # print the results once there is no longer an improvement
         else:
             print('TOTAL TIME TO CALCULATE {} secs'.format(time.time() - self.t))
             print('SMALLEST PENALTY INCURRED: \t{}'.format(self.smallestPenalty))
