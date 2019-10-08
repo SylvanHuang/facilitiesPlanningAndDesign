@@ -7,4 +7,4 @@ Posting the programs to help solve optimization problems with regard to floor la
 2. Type: `git clone https://github.com/ethinallen/facilitiesPlanningAndDesign`
 3. Type: `chmod +x facilitiesPlanningAndDesign/hide.sh`
 4. Type: `./facilitiesPlanningAndDesign/hide.sh`
-5. Type: `./.run.sh program.py`
+5. Type: `./.run.sh program.py` and replace `program.py` with the program you want to run

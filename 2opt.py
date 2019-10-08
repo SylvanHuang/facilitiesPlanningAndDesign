@@ -204,6 +204,7 @@ class solver():
         # the original order going into the iteration
         originalOrder = ''.join(self.smallestPenaltyOrder)
 
+        # generate all orders that are not permutations of the original order
         for i, firstMachine in enumerate(self.smallestPenaltyOrder):
             for j, secondMachine in enumerate(self.smallestPenaltyOrder):
                 if j < i:
@@ -230,6 +231,7 @@ class solver():
                         self.smallestPenaltyOrder = newOrder
                         self.foundSmaller = True
 
+                # reset the distance matrix so that there are no residual distances
                 self.resetDistanceMatrix()
 
         # print the first order of machines without changining the order
